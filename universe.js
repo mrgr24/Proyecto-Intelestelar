@@ -1,4 +1,4 @@
-class Universe {
+export class Universe {
   constructor(data) {
     this.data = data;
     this.grid = document.getElementById("universe-grid");

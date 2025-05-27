@@ -1,4 +1,4 @@
-class BacktrackingExplorer {
+export class BacktrackingExplorer {
   constructor(universe) {
     this.universe = universe;
     this.solution = null;
@@ -88,7 +88,8 @@ class BacktrackingExplorer {
     energy,
     path,
     destroyedBlackHoles = [],
-    usedWormholes = []
+    usedWormholes = [],
+    usedPortals = []
   ) {
     // Si estamos en modo paso a paso, pausar aquí
     if (this.stepMode) {
@@ -112,7 +113,6 @@ class BacktrackingExplorer {
     // Verificar si es una estrella gigante
     const localDestroyedBlackHoles = [...destroyedBlackHoles];
     if (this.universe.isGiantStar(row, col)) {
-      // Buscar agujeros negros adyacentes
       const blackHole = this.universe.canDestroyBlackHole(row, col);
       if (
         blackHole &&
@@ -120,7 +120,6 @@ class BacktrackingExplorer {
           (bh) => bh[0] === blackHole[0] && bh[1] === blackHole[1]
         )
       ) {
-        // Añadir a la lista de agujeros negros destruidos
         localDestroyedBlackHoles.push(blackHole);
       }
     }
@@ -171,40 +170,46 @@ class BacktrackingExplorer {
         }
       }
 
-      // Verificar si es un agujero de gusano
+      // Verificar si es un portal o un agujero de gusano
+      const portal = this.universe.findPortal(nextRow, nextCol);
       const wormhole = this.universe.findWormhole(nextRow, nextCol);
-      let wormholeExit = null;
-      const localUsedWormholes = [...usedWormholes];
+      let nextPosition = null;
+      let localUsedPortals = [...usedPortals];
+      let localUsedWormholes = [...usedWormholes];
 
       if (
+        portal &&
+        !usedPortals.some((p) => p[0] === nextRow && p[1] === nextCol)
+      ) {
+        nextPosition = portal.hasta;
+        localUsedPortals.push([nextRow, nextCol]);
+      } else if (
         wormhole &&
         !usedWormholes.some((w) => w[0] === nextRow && w[1] === nextCol)
       ) {
-        wormholeExit = wormhole.salida;
-        // Verificar si la salida ya está en el camino
-        if (
-          currentPath.some(
-            (pos) => pos[0] === wormholeExit[0] && pos[1] === wormholeExit[1]
-          )
-        ) {
-          continue;
-        }
-        // Marcar este agujero de gusano como usado
+        nextPosition = wormhole.salida;
         localUsedWormholes.push([nextRow, nextCol]);
       }
 
       // Realizar el movimiento recursivamente
       let result;
-      if (wormholeExit) {
-        // Si es un agujero de gusano, continuar desde la salida
-        result = await this.backtrack(
-          wormholeExit[0],
-          wormholeExit[1],
-          newEnergy,
-          [...currentPath, [nextRow, nextCol]],
-          localDestroyedBlackHoles,
-          localUsedWormholes
-        );
+      if (nextPosition) {
+        // Si es un portal o agujero de gusano, continuar desde la salida
+        if (
+          !currentPath.some(
+            (pos) => pos[0] === nextPosition[0] && pos[1] === nextPosition[1]
+          )
+        ) {
+          result = await this.backtrack(
+            nextPosition[0],
+            nextPosition[1],
+            newEnergy,
+            [...currentPath, [nextRow, nextCol]],
+            localDestroyedBlackHoles,
+            localUsedWormholes,
+            localUsedPortals
+          );
+        }
       } else {
         result = await this.backtrack(
           nextRow,
@@ -212,7 +217,8 @@ class BacktrackingExplorer {
           newEnergy,
           currentPath,
           localDestroyedBlackHoles,
-          localUsedWormholes
+          localUsedWormholes,
+          localUsedPortals
         );
       }
 
