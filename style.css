@@ -532,9 +532,10 @@ button:hover::before {
 }
 
 .portal {
-  background-color: #ff00ff;
-  box-shadow: 0 0 8px #ff00ff;
+  background-color: #00ff00;
+  box-shadow: 0 0 8px #00ff00;
   animation: glow 2s infinite alternate;
+  color: black;
 }
 
 /* ===== SCROLLBAR PERSONALIZADO ===== */
