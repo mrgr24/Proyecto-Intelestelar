@@ -3,49 +3,62 @@
     "filas": 35,
     "columnas": 40
   },
-  "origen": [0, 0],
-  "destino": [34, 39],
-  "agujerosNegros": [
-    [3, 5],
-    [10, 20],
-    [8, 8],
-    [15, 15],
-    [25, 25],
-    [30, 30],
-    [12, 35],
-    [20, 5]
-  ],  "estrellasGigantes": [
-    [7, 7],
-    [14, 14],
-    [20, 20],
-    [26, 26],
-    [32, 32],
-    [4, 4],
-    [16, 16],
-    [22, 22]
+  "origen": [
+    0,
+    0
   ],
-  "portales": [
-    { "desde": [5, 10], "hasta": [25, 30] },
-    { "desde": [12, 3], "hasta": [2, 39] },
-    { "desde": [8, 15], "hasta": [28, 20] },
-    { "desde": [18, 25], "hasta": [31, 35] }
+  "destino": [
+    34,
+    39
+  ],
+  "agujerosNegros": [
+    [
+      3,
+      5
+    ],
+    [
+      10,
+      20
+    ],
+    [
+      8,
+      8
+    ]
+  ],
+  "estrellasGigantes": [
+    [
+      7,
+      7
+    ],
+    [
+      14,
+      14
+    ],
+    [
+      20,
+      20
+    ]
   ],
   "agujerosGusano": [
     {
-      "entrada": [11, 11],
-      "salida": [13, 13]
+      "entrada": [
+        11,
+        11
+      ],
+      "salida": [
+        13,
+        13
+      ]
     },
     {
-      "entrada": [18, 5],
-      "salida": [21, 6]
-    },
-    {
-      "entrada": [25, 15],
-      "salida": [28, 16]
-    },
-    {
-      "entrada": [5, 25],
-      "salida": [8, 26]
+      "entrada": [
+        18,
+        5
+      ],
+      "salida": [
+        21,
+        6
+      ]
     }
   ],
   "zonasRecarga": [
@@ -100,25 +113,20 @@
       4
     ]
   ],
-  "celdasCargaRequerida": [    {
-      "coordenada": [9, 9],
-      "cargaGastada": 30
+  "celdasCargaRequerida": [
+    {
+      "coordenada": [
+        9,
+        9
+      ],
+      "cargaGastada": 7
     },
     {
-      "coordenada": [22, 22],
-      "cargaGastada": 22
-    },
-    {
-      "coordenada": [15, 35],
-      "cargaGastada": 10
-    },
-    {
-      "coordenada": [28, 15],
-      "cargaGastada": 15
-    },
-    {
-      "coordenada": [5, 30],
-      "cargaGastada": 8
+      "coordenada": [
+        22,
+        22
+      ],
+      "cargaGastada": 12
     }
   ],
   "cargaInicial": 200,

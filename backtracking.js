@@ -92,7 +92,14 @@ export class BacktrackingExplorer {
     return result !== null;
   }
 
-  async backtrack(row, col, energy, path, destroyedBlackHoles = []) {
+  async backtrack(
+    row,
+    col,
+    energy,
+    path,
+    destroyedBlackHoles = [],
+    usedWormholes = []
+  ) {
     // LOG para saber que se está ejecutando el backtracking
     console.log(
       `[BACKTRACK] Posición: [${row},${col}], Energía: ${energy}, Camino:`,
@@ -185,8 +192,7 @@ export class BacktrackingExplorer {
       // Verificar si es un agujero de gusano
       const wormhole = this.universe.findWormhole(nextRow, nextCol);
       let nextPosition = null;
-      let localUsedWormholes = [];
-
+      let localUsedWormholes = [...usedWormholes];
       if (
         wormhole &&
         !usedWormholes.some((w) => w[0] === nextRow && w[1] === nextCol)
@@ -210,7 +216,8 @@ export class BacktrackingExplorer {
               nextPosition[1],
               newEnergy,
               [...currentPath, [nextRow, nextCol]],
-              localDestroyedBlackHoles
+              localDestroyedBlackHoles,
+              localUsedWormholes
             );
           }
         } else {
@@ -219,7 +226,8 @@ export class BacktrackingExplorer {
             nextCol,
             newEnergy,
             currentPath,
-            localDestroyedBlackHoles
+            localDestroyedBlackHoles,
+            localUsedWormholes
           );
         }
       } else {
