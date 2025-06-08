@@ -22,6 +22,8 @@ export class BacktrackingExplorer {
     this.exploring = true;
     this.solution = null;
     this.universe.reset();
+    this.visitedMap = new Map();
+    this.stepCounter = 0;
 
     // Reiniciar estadísticas
     this.stats = {
@@ -86,6 +88,11 @@ export class BacktrackingExplorer {
         `No existe ninguna ruta válida desde el origen al destino con las restricciones actuales.`,
         "error"
       );
+
+      this.universe.logMessage(
+        `Pasos totales intentados: ${this.stepCounter}`,
+        "info"
+      );
     }
 
     this.exploring = false;
@@ -96,153 +103,125 @@ export class BacktrackingExplorer {
     row,
     col,
     energy,
-    path,
+    path = [],
     destroyedBlackHoles = [],
     usedWormholes = []
   ) {
-    // LOG para saber que se está ejecutando el backtracking
-    console.log(
-      `[BACKTRACK] Posición: [${row},${col}], Energía: ${energy}, Camino:`,
-      path
-    );
+    const key = `${row},${col}`;
+    if (!this.visitedMap) this.visitedMap = new Map();
+    if (this.visitedMap.has(key) && this.visitedMap.get(key) >= energy)
+      return null;
+    this.visitedMap.set(key, energy);
 
-    // Si estamos en modo paso a paso, pausar aquí
-    if (this.stepMode) {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    }
+    if (!this.stepCounter) this.stepCounter = 0;
+    this.stepCounter++;
+    if (this.stepCounter > 1000000) return null;
 
-    // Verificar si hemos llegado al destino
     const [destRow, destCol] = this.universe.data.destino;
     if (row === destRow && col === destCol) {
       return [...path, [row, col]];
     }
 
-    // Verificar si nos quedamos sin energía
-    if (energy <= 0) {
-      return null;
-    }
+    if (energy <= 0) return null;
 
-    // Marcar la posición actual como visitada
-    const currentPath = [...path, [row, col]];
+    path.push([row, col]);
 
-    // Verificar si es una estrella gigante
-    const localDestroyedBlackHoles = [...destroyedBlackHoles];
+    console.log(`[ENTER] (${row},${col}) - Energía: ${energy}`);
+
+    let destroyedThisStep = null;
     if (this.universe.isGiantStar(row, col)) {
-      const blackHole = this.universe.canDestroyBlackHole(row, col);
+      const bh = this.universe.canDestroyBlackHole(row, col);
       if (
-        blackHole &&
-        !destroyedBlackHoles.some(
-          (bh) => bh[0] === blackHole[0] && bh[1] === blackHole[1]
-        )
+        bh &&
+        !destroyedBlackHoles.some(([r, c]) => r === bh[0] && c === bh[1])
       ) {
-        localDestroyedBlackHoles.push(blackHole);
+        destroyedBlackHoles.push(bh);
+        destroyedThisStep = bh;
       }
     }
 
-    // Obtener posibles movimientos (arriba, derecha, abajo, izquierda)
-    const moves = [
-      [row - 1, col], // arriba
-      [row, col + 1], // derecha
-      [row + 1, col], // abajo
-      [row, col - 1], // izquierda
+    let moves = [
+      [row - 1, col],
+      [row, col + 1],
+      [row + 1, col],
+      [row, col - 1],
     ];
 
-    // Intentar cada movimiento
-    for (const [nextRow, nextCol] of moves) {
-      // LOG para saber qué movimientos se están probando
-      console.log(
-        `[BACKTRACK] Intentando mover a: [${nextRow},${nextCol}] desde [${row},${col}]`
-      );
-      // Verificar si el movimiento es válido
-      if (!this.universe.isValidCell(nextRow, nextCol)) continue;
+    moves.sort((a, b) => {
+      const dA = Math.abs(a[0] - destRow) + Math.abs(a[1] - destCol);
+      const dB = Math.abs(b[0] - destRow) + Math.abs(b[1] - destCol);
+      return dA - dB;
+    });
 
-      // Verificar si es un agujero negro y no ha sido destruido
+    for (const [nextRow, nextCol] of moves) {
+      if (!this.universe.isValidCell(nextRow, nextCol)) continue;
       if (
         this.universe.isBlackHole(nextRow, nextCol) &&
-        !localDestroyedBlackHoles.some(
-          (bh) => bh[0] === nextRow && bh[1] === nextCol
-        )
+        !destroyedBlackHoles.some(([r, c]) => r === nextRow && c === nextCol)
       ) {
         continue;
       }
+      if (path.some(([r, c]) => r === nextRow && c === nextCol)) continue;
 
-      // Verificar si ya está en el camino (evitar ciclos)
-      if (currentPath.some((pos) => pos[0] === nextRow && pos[1] === nextCol))
-        continue;
-
-      // Calcular energía después del movimiento
       let newEnergy = energy;
-
-      // Verificar si es una zona de recarga
-      const rechargeZone = this.universe.findRechargeZone(nextRow, nextCol);
-      if (rechargeZone) {
-        newEnergy *= rechargeZone[2];
+      const recharge = this.universe.findRechargeZone(nextRow, nextCol);
+      if (recharge) {
+        newEnergy *= recharge[2];
       } else {
-        // Verificar si es una celda con carga mínima requerida
-        const minChargeCell = this.universe.findMinChargeCell(nextRow, nextCol);
-        if (minChargeCell) {
-          if (newEnergy < minChargeCell.cargaGastada) continue;
-          newEnergy -= minChargeCell.cargaGastada;
+        const minReq = this.universe.findMinChargeCell(nextRow, nextCol);
+        if (minReq) {
+          if (newEnergy < minReq.cargaGastada) continue;
+          newEnergy -= minReq.cargaGastada;
         } else {
-          // Restar el costo de energía normal
           newEnergy -= this.universe.data.matrizInicial[nextRow][nextCol];
         }
       }
 
-      // Verificar si es un agujero de gusano
-      const wormhole = this.universe.findWormhole(nextRow, nextCol);
-      let nextPosition = null;
-      let localUsedWormholes = [...usedWormholes];
+      let wormhole = this.universe.findWormhole(nextRow, nextCol);
+      let nextPos = null;
+      let usedNow = false;
       if (
         wormhole &&
-        !usedWormholes.some((w) => w[0] === nextRow && w[1] === nextCol)
+        !usedWormholes.some(([r, c]) => r === nextRow && c === nextCol)
       ) {
-        nextPosition = wormhole.salida;
-        localUsedWormholes.push([nextRow, nextCol]);
+        nextPos = wormhole.salida;
+        usedWormholes.push([nextRow, nextCol]);
+        usedNow = true;
       }
 
-      // Realizar el movimiento recursivamente SOLO si hay energía suficiente
-      let result;
-      if (newEnergy > 0) {
-        if (nextPosition) {
-          // Si es un agujero de gusano, continuar desde la salida
-          if (
-            !currentPath.some(
-              (pos) => pos[0] === nextPosition[0] && pos[1] === nextPosition[1]
-            )
-          ) {
-            result = await this.backtrack(
-              nextPosition[0],
-              nextPosition[1],
-              newEnergy,
-              [...currentPath, [nextRow, nextCol]],
-              localDestroyedBlackHoles,
-              localUsedWormholes
-            );
-          }
-        } else {
+      if (newEnergy <= 0) continue;
+
+      let result = null;
+      if (nextPos) {
+        if (!path.some(([r, c]) => r === nextPos[0] && c === nextPos[1])) {
+          path.push([nextRow, nextCol]);
           result = await this.backtrack(
-            nextRow,
-            nextCol,
+            nextPos[0],
+            nextPos[1],
             newEnergy,
-            currentPath,
-            localDestroyedBlackHoles,
-            localUsedWormholes
+            path,
+            destroyedBlackHoles,
+            usedWormholes
           );
+          path.pop();
         }
       } else {
-        // LOG para saber que no se avanza por falta de energía
-        console.log(
-          `[BACKTRACK] No se avanza a [${nextRow},${nextCol}] desde [${row},${col}] por energía insuficiente (${newEnergy})`
+        result = await this.backtrack(
+          nextRow,
+          nextCol,
+          newEnergy,
+          path,
+          destroyedBlackHoles,
+          usedWormholes
         );
       }
 
-      if (result) {
-        return result;
-      }
+      if (result) return result;
+      if (usedNow) usedWormholes.pop();
     }
 
-    // No se encontró solución desde esta posición
+    if (destroyedThisStep) destroyedBlackHoles.pop();
+    path.pop();
     return null;
   }
 

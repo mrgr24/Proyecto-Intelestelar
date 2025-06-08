@@ -5,7 +5,6 @@
   "agujerosNegros": [ [2,2], [3,3], [5,5], [7,7], [0,3], [1,3], [2,3], [3,6], [4,6], [5,6], [6,6], [7,3], [8,3] ],
   "estrellasGigantes": [ [1,1], [4,4], [6,8], [8,8], [0,9] ],
   "agujerosGusano": [ { "entrada": [2, 7], "salida": [7, 2] } ],
-  "portales": [],
   "zonasRecarga": [ [1, 8, 2], [8, 1, 3] ],
   "celdasCargaRequerida": [ { "coordenada": [5, 2], "cargaGastada": 10 }, { "coordenada": [7, 5], "cargaGastada": 12 } ],
   "cargaInicial": 25,

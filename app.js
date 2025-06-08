@@ -234,7 +234,6 @@ function validateJSONStructure(data) {
       "destino",
       "agujerosNegros",
       "estrellasGigantes",
-      "portales",
       "agujerosGusano",
       "zonasRecarga",
       "celdasCargaRequerida",
@@ -285,22 +284,7 @@ function validateJSONStructure(data) {
       throw new Error("Formato inválido de agujeros negros");
     }
 
-    // 6. Validar portales
-    if (!Array.isArray(data.portales)) {
-      throw new Error("Formato inválido de portales");
-    }
-    for (const portal of data.portales) {
-      if (
-        !portal.desde ||
-        !portal.hasta ||
-        !Array.isArray(portal.desde) ||
-        !Array.isArray(portal.hasta)
-      ) {
-        throw new Error("Formato inválido en la definición de portales");
-      }
-    }
-
-    // 7. Validar agujeros de gusano
+    // 6. Validar agujeros de gusano
     if (!Array.isArray(data.agujerosGusano)) {
       throw new Error("Formato inválido de agujeros de gusano");
     }
@@ -317,7 +301,7 @@ function validateJSONStructure(data) {
       }
     }
 
-    // 8. Validar zonas de recarga
+    // 7. Validar zonas de recarga
     if (!Array.isArray(data.zonasRecarga)) {
       throw new Error("Formato inválido de zonas de recarga");
     }
@@ -333,7 +317,7 @@ function validateJSONStructure(data) {
       }
     }
 
-    // 9. Validar celdas con carga requerida
+    // 8. Validar celdas con carga requerida
     if (!Array.isArray(data.celdasCargaRequerida)) {
       throw new Error("Formato inválido de celdas con carga requerida");
     }
@@ -349,12 +333,12 @@ function validateJSONStructure(data) {
       }
     }
 
-    // 10. Validar carga inicial
+    // 9. Validar carga inicial
     if (typeof data.cargaInicial !== "number" || data.cargaInicial <= 0) {
       throw new Error("Carga inicial inválida");
     }
 
-    // 11. Validar matriz inicial
+    // 10. Validar matriz inicial
     if (!Array.isArray(data.matrizInicial)) {
       throw new Error("Formato inválido de matriz inicial");
     }
@@ -397,10 +381,6 @@ function getDefaultJsonData() {
       [20, 20],
       [26, 26],
       [32, 32],
-    ],
-    portales: [
-      { desde: [5, 10], hasta: [25, 30] },
-      { desde: [12, 3], hasta: [2, 39] },
     ],
     agujerosGusano: [
       { entrada: [11, 11], salida: [13, 13] },
