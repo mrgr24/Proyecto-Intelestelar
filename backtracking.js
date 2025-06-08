@@ -57,6 +57,11 @@ export class BacktrackingExplorer {
         "success"
       );
       this.solution = result;
+      // Log adicional para indicar que se encontró al menos una ruta
+      this.universe.logMessage(
+        `Se encontró al menos una ruta válida desde el origen al destino.`,
+        "info"
+      );
 
       // Actualizar estadísticas
       this.stats.totalSteps = this.solution.length - 1; // Restar 1 porque el origen no cuenta como paso
@@ -73,7 +78,12 @@ export class BacktrackingExplorer {
       this.updateStatsPanel();
     } else {
       this.universe.logMessage(
-        `No se encontró solución después de ${this.stats.explorationTime} segundos.`,
+        `No se encontró ninguna ruta después de ${this.stats.explorationTime} segundos.`,
+        "error"
+      );
+      // Log adicional para indicar que no hay rutas
+      this.universe.logMessage(
+        `No existe ninguna ruta válida desde el origen al destino con las restricciones actuales.`,
         "error"
       );
     }
@@ -82,15 +92,13 @@ export class BacktrackingExplorer {
     return result !== null;
   }
 
-  async backtrack(
-    row,
-    col,
-    energy,
-    path,
-    destroyedBlackHoles = [],
-    usedWormholes = [],
-    usedPortals = []
-  ) {
+  async backtrack(row, col, energy, path, destroyedBlackHoles = []) {
+    // LOG para saber que se está ejecutando el backtracking
+    console.log(
+      `[BACKTRACK] Posición: [${row},${col}], Energía: ${energy}, Camino:`,
+      path
+    );
+
     // Si estamos en modo paso a paso, pausar aquí
     if (this.stepMode) {
       await new Promise((resolve) => setTimeout(resolve, 0));
@@ -134,6 +142,10 @@ export class BacktrackingExplorer {
 
     // Intentar cada movimiento
     for (const [nextRow, nextCol] of moves) {
+      // LOG para saber qué movimientos se están probando
+      console.log(
+        `[BACKTRACK] Intentando mover a: [${nextRow},${nextCol}] desde [${row},${col}]`
+      );
       // Verificar si el movimiento es válido
       if (!this.universe.isValidCell(nextRow, nextCol)) continue;
 
@@ -170,20 +182,12 @@ export class BacktrackingExplorer {
         }
       }
 
-      // Verificar si es un portal o un agujero de gusano
-      const portal = this.universe.findPortal(nextRow, nextCol);
+      // Verificar si es un agujero de gusano
       const wormhole = this.universe.findWormhole(nextRow, nextCol);
       let nextPosition = null;
-      let localUsedPortals = [...usedPortals];
-      let localUsedWormholes = [...usedWormholes];
+      let localUsedWormholes = [];
 
       if (
-        portal &&
-        !usedPortals.some((p) => p[0] === nextRow && p[1] === nextCol)
-      ) {
-        nextPosition = portal.hasta;
-        localUsedPortals.push([nextRow, nextCol]);
-      } else if (
         wormhole &&
         !usedWormholes.some((w) => w[0] === nextRow && w[1] === nextCol)
       ) {
@@ -191,34 +195,37 @@ export class BacktrackingExplorer {
         localUsedWormholes.push([nextRow, nextCol]);
       }
 
-      // Realizar el movimiento recursivamente
+      // Realizar el movimiento recursivamente SOLO si hay energía suficiente
       let result;
-      if (nextPosition) {
-        // Si es un portal o agujero de gusano, continuar desde la salida
-        if (
-          !currentPath.some(
-            (pos) => pos[0] === nextPosition[0] && pos[1] === nextPosition[1]
-          )
-        ) {
+      if (newEnergy > 0) {
+        if (nextPosition) {
+          // Si es un agujero de gusano, continuar desde la salida
+          if (
+            !currentPath.some(
+              (pos) => pos[0] === nextPosition[0] && pos[1] === nextPosition[1]
+            )
+          ) {
+            result = await this.backtrack(
+              nextPosition[0],
+              nextPosition[1],
+              newEnergy,
+              [...currentPath, [nextRow, nextCol]],
+              localDestroyedBlackHoles
+            );
+          }
+        } else {
           result = await this.backtrack(
-            nextPosition[0],
-            nextPosition[1],
+            nextRow,
+            nextCol,
             newEnergy,
-            [...currentPath, [nextRow, nextCol]],
-            localDestroyedBlackHoles,
-            localUsedWormholes,
-            localUsedPortals
+            currentPath,
+            localDestroyedBlackHoles
           );
         }
       } else {
-        result = await this.backtrack(
-          nextRow,
-          nextCol,
-          newEnergy,
-          currentPath,
-          localDestroyedBlackHoles,
-          localUsedWormholes,
-          localUsedPortals
+        // LOG para saber que no se avanza por falta de energía
+        console.log(
+          `[BACKTRACK] No se avanza a [${nextRow},${nextCol}] desde [${row},${col}] por energía insuficiente (${newEnergy})`
         );
       }
 

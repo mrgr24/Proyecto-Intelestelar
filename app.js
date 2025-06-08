@@ -1,6 +1,6 @@
 // Importar clases necesarias
-import { Universe } from './universe.js';
-import { BacktrackingExplorer } from './backtracking.js';
+import { Universe } from "./universe.js";
+import { BacktrackingExplorer } from "./backtracking.js";
 
 // Variables globales
 let universeData;
@@ -16,19 +16,24 @@ async function loadUniverseData(customFilePath = null) {
       // Cargar JSON externo
       const response = await fetch(customFilePath);
       if (!response.ok) {
-        throw new Error(`Error al cargar ${customFilePath}: ${response.statusText}`);
+        throw new Error(
+          `Error al cargar ${customFilePath}: ${response.statusText}`
+        );
       }
       jsonData = await response.json();
     } else {
       try {
         // Intentar cargar JSON interno
-        const response = await fetch('ejemplo.json');
+        const response = await fetch("ejemplo.json");
         if (!response.ok) {
-          throw new Error('No se pudo cargar ejemplo.json');
+          throw new Error("No se pudo cargar ejemplo.json");
         }
         jsonData = await response.json();
       } catch (internalError) {
-        console.warn("No se pudo cargar el JSON interno, usando valores por defecto:", internalError);
+        console.warn(
+          "No se pudo cargar el JSON interno, usando valores por defecto:",
+          internalError
+        );
         // Usar JSON por defecto
         jsonData = getDefaultJsonData();
       }
@@ -73,36 +78,44 @@ function initializeUniverse() {
     const stepBtn = document.getElementById("step-btn");
 
     if (startBtn) {
-      startBtn.addEventListener("click", async () => {
+      // Eliminar listeners previos para evitar duplicados
+      const newStartBtn = startBtn.cloneNode(true);
+      startBtn.parentNode.replaceChild(newStartBtn, startBtn);
+      newStartBtn.addEventListener("click", async () => {
         if (explorer.exploring) return;
 
-        startBtn.disabled = true;
-        stepBtn.disabled = true;
-
+        newStartBtn.disabled = true;
         // Habilitar modo paso a paso
         explorer.enableStepMode();
 
         // Iniciar exploración
         const success = await explorer.findPath();
 
-        startBtn.disabled = false;
-        stepBtn.disabled = !success;
+        newStartBtn.disabled = false;
+        // Habilitar el botón de paso solo si hay solución
+        const stepBtn = document.getElementById("step-btn");
+        if (stepBtn) stepBtn.disabled = !success;
       });
     }
 
     if (resetBtn) {
-      resetBtn.addEventListener("click", () => {
+      const newResetBtn = resetBtn.cloneNode(true);
+      resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
+      newResetBtn.addEventListener("click", () => {
         universe.reset();
-        stepBtn.disabled = true;
+        const stepBtn = document.getElementById("step-btn");
+        if (stepBtn) stepBtn.disabled = true;
       });
     }
 
     if (stepBtn) {
-      stepBtn.addEventListener("click", async () => {
+      const newStepBtn = stepBtn.cloneNode(true);
+      stepBtn.parentNode.replaceChild(newStepBtn, stepBtn);
+      newStepBtn.addEventListener("click", async () => {
         if (!explorer.solution) return;
 
         const hasMoreSteps = await explorer.takeStep();
-        stepBtn.disabled = !hasMoreSteps;
+        newStepBtn.disabled = !hasMoreSteps;
       });
     }
   } catch (error) {
@@ -124,7 +137,7 @@ function loadJSONFile(file) {
     reader.onload = async (event) => {
       try {
         const data = JSON.parse(event.target.result);
-        
+
         // Validar la estructura del JSON
         if (!validateJSONStructure(data)) {
           throw new Error("El archivo no cumple con la estructura requerida");
@@ -216,17 +229,17 @@ function validateJSONStructure(data) {
   try {
     // 1. Verificar que existan todos los campos requeridos
     const requiredFields = [
-      'matriz',
-      'origen',
-      'destino',
-      'agujerosNegros',
-      'estrellasGigantes',
-      'portales',
-      'agujerosGusano',
-      'zonasRecarga',
-      'celdasCargaRequerida',
-      'cargaInicial',
-      'matrizInicial'
+      "matriz",
+      "origen",
+      "destino",
+      "agujerosNegros",
+      "estrellasGigantes",
+      "portales",
+      "agujerosGusano",
+      "zonasRecarga",
+      "celdasCargaRequerida",
+      "cargaInicial",
+      "matrizInicial",
     ];
 
     for (const field of requiredFields) {
@@ -236,20 +249,34 @@ function validateJSONStructure(data) {
     }
 
     // 2. Validar matriz
-    if (!data.matriz.filas || !data.matriz.columnas ||
-        typeof data.matriz.filas !== 'number' ||
-        typeof data.matriz.columnas !== 'number') {
+    if (
+      !data.matriz.filas ||
+      !data.matriz.columnas ||
+      typeof data.matriz.filas !== "number" ||
+      typeof data.matriz.columnas !== "number"
+    ) {
       throw new Error("Dimensiones de matriz inválidas");
     }
+    // Quitar temporalmente la validación de mínimo 30x30
+    // if (data.matriz.filas < 30 || data.matriz.columnas < 30) {
+    //   throw new Error("La matriz debe ser mínimo de 30x30");
+    // }
 
     // 3. Validar coordenadas origen y destino
-    if (!Array.isArray(data.origen) || data.origen.length !== 2 ||
-        !Array.isArray(data.destino) || data.destino.length !== 2) {
+    if (
+      !Array.isArray(data.origen) ||
+      data.origen.length !== 2 ||
+      !Array.isArray(data.destino) ||
+      data.destino.length !== 2
+    ) {
       throw new Error("Formato inválido de coordenadas origen/destino");
     }
 
     // 4. Validar estrellas gigantes (mínimo 5)
-    if (!Array.isArray(data.estrellasGigantes) || data.estrellasGigantes.length < 5) {
+    if (
+      !Array.isArray(data.estrellasGigantes) ||
+      data.estrellasGigantes.length < 5
+    ) {
       throw new Error("Se requieren al menos 5 estrellas gigantes");
     }
 
@@ -263,8 +290,12 @@ function validateJSONStructure(data) {
       throw new Error("Formato inválido de portales");
     }
     for (const portal of data.portales) {
-      if (!portal.desde || !portal.hasta || 
-          !Array.isArray(portal.desde) || !Array.isArray(portal.hasta)) {
+      if (
+        !portal.desde ||
+        !portal.hasta ||
+        !Array.isArray(portal.desde) ||
+        !Array.isArray(portal.hasta)
+      ) {
         throw new Error("Formato inválido en la definición de portales");
       }
     }
@@ -274,9 +305,15 @@ function validateJSONStructure(data) {
       throw new Error("Formato inválido de agujeros de gusano");
     }
     for (const gusano of data.agujerosGusano) {
-      if (!gusano.entrada || !gusano.salida ||
-          !Array.isArray(gusano.entrada) || !Array.isArray(gusano.salida)) {
-        throw new Error("Formato inválido en la definición de agujeros de gusano");
+      if (
+        !gusano.entrada ||
+        !gusano.salida ||
+        !Array.isArray(gusano.entrada) ||
+        !Array.isArray(gusano.salida)
+      ) {
+        throw new Error(
+          "Formato inválido en la definición de agujeros de gusano"
+        );
       }
     }
 
@@ -285,8 +322,14 @@ function validateJSONStructure(data) {
       throw new Error("Formato inválido de zonas de recarga");
     }
     for (const zona of data.zonasRecarga) {
-      if (!Array.isArray(zona) || zona.length !== 3 || typeof zona[2] !== 'number') {
-        throw new Error("Formato inválido en la definición de zonas de recarga");
+      if (
+        !Array.isArray(zona) ||
+        zona.length !== 3 ||
+        typeof zona[2] !== "number"
+      ) {
+        throw new Error(
+          "Formato inválido en la definición de zonas de recarga"
+        );
       }
     }
 
@@ -295,14 +338,19 @@ function validateJSONStructure(data) {
       throw new Error("Formato inválido de celdas con carga requerida");
     }
     for (const celda of data.celdasCargaRequerida) {
-      if (!celda.coordenada || !Array.isArray(celda.coordenada) ||
-          typeof celda.cargaGastada !== 'number') {
-        throw new Error("Formato inválido en la definición de celdas con carga requerida");
+      if (
+        !celda.coordenada ||
+        !Array.isArray(celda.coordenada) ||
+        typeof celda.cargaGastada !== "number"
+      ) {
+        throw new Error(
+          "Formato inválido en la definición de celdas con carga requerida"
+        );
       }
     }
 
     // 10. Validar carga inicial
-    if (typeof data.cargaInicial !== 'number' || data.cargaInicial <= 0) {
+    if (typeof data.cargaInicial !== "number" || data.cargaInicial <= 0) {
       throw new Error("Carga inicial inválida");
     }
 
@@ -314,7 +362,9 @@ function validateJSONStructure(data) {
       const filas = data.matrizInicial.length;
       const columnas = data.matrizInicial[0].length;
       if (filas !== data.matriz.filas || columnas !== data.matriz.columnas) {
-        throw new Error("Dimensiones de matriz inicial no coinciden con las dimensiones especificadas");
+        throw new Error(
+          "Dimensiones de matriz inicial no coinciden con las dimensiones especificadas"
+        );
       }
     }
 
@@ -330,7 +380,7 @@ function getDefaultJsonData() {
   const defaultData = {
     matriz: {
       filas: 35,
-      columnas: 40
+      columnas: 40,
     },
     origen: [0, 0],
     destino: [34, 39],
@@ -339,33 +389,33 @@ function getDefaultJsonData() {
       [10, 20],
       [8, 8],
       [15, 15],
-      [25, 25]
+      [25, 25],
     ],
     estrellasGigantes: [
       [7, 7],
       [14, 14],
       [20, 20],
       [26, 26],
-      [32, 32]
+      [32, 32],
     ],
     portales: [
       { desde: [5, 10], hasta: [25, 30] },
-      { desde: [12, 3], hasta: [2, 39] }
+      { desde: [12, 3], hasta: [2, 39] },
     ],
     agujerosGusano: [
       { entrada: [11, 11], salida: [13, 13] },
-      { entrada: [18, 5], salida: [21, 6] }
+      { entrada: [18, 5], salida: [21, 6] },
     ],
     zonasRecarga: [
       [4, 4, 3],
-      [15, 15, 2]
+      [15, 15, 2],
     ],
     celdasCargaRequerida: [
       { coordenada: [9, 9], cargaGastada: 30 },
-      { coordenada: [22, 22], cargaGastada: 22 }
+      { coordenada: [22, 22], cargaGastada: 22 },
     ],
     cargaInicial: 200,
-    matrizInicial: []
+    matrizInicial: [],
   };
 
   // Generar matriz inicial
@@ -383,6 +433,5 @@ function getDefaultJsonData() {
 
 // Cargar datos al iniciar
 document.addEventListener("DOMContentLoaded", () => {
-  loadUniverseData();
-  setupFileUpload();
+  setupFileUpload(); // Solo habilita la carga de archivos, no inicializa universo
 });

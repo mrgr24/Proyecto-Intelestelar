@@ -1,126 +1,168 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🚀 Exploración Galáctica - Misión Interestelar</title>
-  
-  <!-- Fuentes de Google -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
-  
-  <!-- Iconos de Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Estilos CSS -->
-  <link rel="stylesheet" href="./style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🚀 Exploración Galáctica - Misión Interestelar</title>
+
+    <!-- Fuentes de Google -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Iconos de Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="./style.css" />
     <!-- Módulos JavaScript -->
-  <script type="module" src="./app.js" defer></script>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>🌌 Exploración Galáctica 🚀</h1>
-      <div class="info-panel">
-        <div class="energy-display">
-          <span>Energía: </span>
-          <span id="energy-value">200</span>
+    <script type="module" src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🌌 Exploración Galáctica 🚀</h1>
+        <div class="info-panel">
+          <div class="energy-display">
+            <span>Energía: </span>
+            <span id="energy-value">200</span>
+          </div>
+          <div class="controls">
+            <button id="start-btn">🚀 Iniciar Exploración</button>
+            <button id="reset-btn">🔄 Reiniciar</button>
+            <button id="step-btn" disabled>👣 Siguiente Paso</button>
+          </div>
         </div>
-        <div class="controls">
-          <button id="start-btn">🚀 Iniciar Exploración</button>
-          <button id="reset-btn">🔄 Reiniciar</button>
-          <button id="step-btn" disabled>👣 Siguiente Paso</button>
-        </div>
-      </div>
-    </header>
+      </header>
 
-    <div class="main-content">
-      <div class="universe-container">
-        <div id="universe-grid"></div>
-      </div>
+      <div class="main-content">
+        <div class="left-content">
+          <div class="universe-container">
+            <div id="universe-grid"></div>
+          </div>
 
-      <div class="side-panel">
-        <div class="legend">
-          <h3>🗺️ Leyenda del Universo</h3>
-          <div class="legend-item">
-            <div class="legend-color origin">🚀</div>
-            <span>Origen - Punto de partida</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color destination">🎯</div>
-            <span>Destino - Meta a alcanzar</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color black-hole">🕳️</div>
-            <span>Agujero Negro - Peligro mortal</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color portal">🌈</div>
-            <span>Portal - Teletransporte instantáneo</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color giant-star">⭐</div>
-            <span>Estrella Gigante - Destruye agujeros negros</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color wormhole">🌀</div>
-            <span>Agujero de Gusano</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color portal"></div>
-            <span>Portal</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color recharge"></div>
-            <span>Zona de Recarga</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color min-charge">⚠️</div>
-            <span>Carga Mínima Requerida</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color ship">🛸</div>
-            <span>Nave - Posición actual</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color path"></div>
-            <span>Camino Recorrido</span>
+          <div class="credits-panel">
+            <div class="credits-header">
+              <i class="fas fa-users"></i>
+              <h3>Trabajo Realizado Por</h3>
+            </div>
+
+            <div class="authors-grid">
+              <div class="author-card">
+                <i class="fas fa-user-astronaut"></i>
+                <span>Mariana Garcia</span>
+              </div>
+              <div class="author-card">
+                <i class="fas fa-user-astronaut"></i>
+                <span>Alejandro Preciado</span>
+              </div>
+            </div>
+
+            <div class="university-section">
+              <div class="university-logo-container">
+                <img
+                  src="./Logo_de_la_Universidad_de_Caldas.svg.png"
+                  alt="Logo Universidad"
+                  id="university-logo"
+                />
+              </div>
+              <div class="university-details">
+                <div class="university-name">Universidad de Caldas</div>
+                <div class="course-name">AutoTecnicas</div>
+                <div class="academic-year">2025</div>
+              </div>
+            </div>
+
+            <div class="tech-footer">
+              <i class="fas fa-code"></i>
+              <span>Implementación de Algoritmo Backtracking</span>
+            </div>
           </div>
         </div>
 
-        <div class="log-panel">
-          <h3>📋 Registro de Exploración</h3>
-          <div id="exploration-log"></div>
-        </div>
+        <div class="side-panel">
+          <div class="legend">
+            <h3>🗺️ Leyenda del Universo</h3>
+            <div class="legend-item">
+              <div class="legend-color origin">🚀</div>
+              <span>Origen - Punto de partida</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color destination">🎯</div>
+              <span>Destino - Meta a alcanzar</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color black-hole">🕳️</div>
+              <span>Agujero Negro - Peligro mortal</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color giant-star">⭐</div>
+              <span>Estrella Gigante - Destruye agujeros negros</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color wormhole">🌀</div>
+              <span>Agujero de Gusano - Teletransporte consumible</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color recharge">🔋</div>
+              <span>Zona de Recarga - Multiplica energía</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color min-charge">⚠️</div>
+              <span>Carga Mínima Requerida</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color path"></div>
+              <span>Camino Recorrido</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color exploring"></div>
+              <span>Explorando - Backtracking en progreso</span>
+            </div>
+          </div>
 
-        <div class="stats-panel">
-          <h3>📊 Estadísticas de Misión</h3>
-          <div class="stat-item">
-            <span class="stat-label">👣 Pasos totales:</span>
-            <span class="stat-value" id="total-steps">0</span>
+          <div class="log-panel">
+            <h3>📋 Registro de Exploración</h3>
+            <div id="exploration-log"></div>
           </div>
-          <div class="stat-item">
-            <span class="stat-label">💥 Agujeros negros destruidos:</span>
-            <span class="stat-value" id="destroyed-blackholes">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">🌀 Agujeros de gusano usados:</span>
-            <span class="stat-value" id="used-wormholes">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">🔋 Recargas de energía:</span>
-            <span class="stat-value" id="energy-recharges">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">⚡ Energía consumida:</span>
-            <span class="stat-value" id="energy-consumed">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">⏱️ Tiempo de exploración:</span>
-            <span class="stat-value" id="exploration-time">0s</span>
+
+          <div class="stats-panel">
+            <h3>📊 Estadísticas de Misión</h3>
+            <div class="stat-item">
+              <span class="stat-label">🔍 Celdas exploradas:</span>
+              <span class="stat-value" id="explored-cells">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">👣 Pasos totales:</span>
+              <span class="stat-value" id="total-steps">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">💥 Agujeros negros destruidos:</span>
+              <span class="stat-value" id="destroyed-blackholes">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">🌀 Agujeros de gusano usados:</span>
+              <span class="stat-value" id="used-wormholes">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">🔋 Recargas de energía:</span>
+              <span class="stat-value" id="energy-recharges">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">⚡ Energía consumida:</span>
+              <span class="stat-value" id="energy-consumed">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">⏱️ Tiempo de exploración:</span>
+              <span class="stat-value" id="exploration-time">0s</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

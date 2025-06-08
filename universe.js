@@ -56,7 +56,6 @@ export class Universe {
       agujerosGusano,
       zonasRecarga,
       celdasCargaRequerida,
-      portales,
     } = this.data;
 
     // Origen
@@ -99,22 +98,6 @@ export class Universe {
       });
     }
 
-    // Portales
-    if (portales && Array.isArray(portales)) {
-      portales.forEach((portal) => {
-        const { desde, hasta } = portal;
-        this.setCellType(desde[0], desde[1], "portal");
-        this.cells[desde[0]][desde[1]].textContent = "P";
-
-        // Actualizar tooltip para mostrar el destino
-        const cellInfo =
-          this.cells[desde[0]][desde[1]].querySelector(".cell-info");
-        if (cellInfo) {
-          cellInfo.textContent += ` → [${hasta[0]},${hasta[1]}]`;
-        }
-      });
-    }
-
     // Zonas de Recarga
     if (zonasRecarga && Array.isArray(zonasRecarga)) {
       zonasRecarga.forEach((zone) => {
@@ -149,13 +132,13 @@ export class Universe {
   }
 
   getTypeName(type) {
+    // Eliminar la entrada 'portal' del diccionario de tipos
     const types = {
       origin: "Origen",
       destination: "Destino",
       "black-hole": "Agujero Negro",
       "giant-star": "Estrella Gigante",
       wormhole: "Agujero de Gusano",
-      portal: "Portal",
       recharge: "Zona de Recarga",
       "min-charge": "Carga Mínima",
       ship: "Nave",
@@ -236,18 +219,6 @@ export class Universe {
         `Movimiento a [${row},${col}] - Energía: -${energyCost} → ${this.currentEnergy}`,
         "info"
       );
-    }
-
-    // Verificar si es un portal
-    const portal = this.findPortal(row, col);
-    if (portal) {
-      const [exitRow, exitCol] = portal.hasta;
-      this.logMessage(
-        `¡Portal! [${row},${col}] → [${exitRow},${exitCol}]`,
-        "info"
-      );
-      row = exitRow;
-      col = exitCol;
     }
 
     // Verificar si es un agujero de gusano
@@ -422,15 +393,6 @@ export class Universe {
       this.data.agujerosGusano &&
       this.data.agujerosGusano.find(
         (wormhole) => wormhole.entrada[0] === row && wormhole.entrada[1] === col
-      )
-    );
-  }
-
-  findPortal(row, col) {
-    return (
-      this.data.portales &&
-      this.data.portales.find(
-        (portal) => portal.desde[0] === row && portal.desde[1] === col
       )
     );
   }
